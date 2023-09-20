@@ -1,0 +1,22 @@
+;; shadow-cljs configuration
+{:source-paths
+ ["src/dev"
+  "src/main"
+  "src/test"]
+
+ :dependencies
+ [[reagent "1.2.0"]]
+
+ :dev-http {8080 "public"}
+
+ :builds
+ {:app
+  {:target     :browser
+   :output-dir "public/js"
+   :asset-path "/js"
+   :modules    {:shared {:entries []}
+                :main   {:init-fn pro.bohlender.mastermind-solver.app/init
+                         :depends-on #{:shared}}
+                :worker {:init-fn    pro.bohlender.mastermind-solver.solver/init
+                         :depends-on #{:shared}
+                         :web-worker true}}}}}
