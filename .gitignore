@@ -1,5 +1,6 @@
 node_modules/
 public/js
+public/css
 
 /target
 /checkouts
@@ -12,6 +13,8 @@ pom.xml.asc
 *.log
 .shadow-cljs
 .idea
+.clj-kondo
+.lsp
 .lein-*
 .nrepl-*
 .DS_Store

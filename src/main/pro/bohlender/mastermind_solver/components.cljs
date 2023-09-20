@@ -32,7 +32,7 @@
           [:h1.title "Mastermind Solver"]
           [:p
            "In " [:a {:href "https://en.wikipedia.org/wiki/Mastermind_(board_game)"} "Mastermind"] "-style puzzles you're expected to guess a secret code in as few tries as possible – only guided by the codemaker's feedback on your guesses."
-           " For human players such puzzles can quickly grow intractable so this page implements " [:a {:href "https://bohlender.pro/blog/playing-hard-mastermind-games-with-a-sat-based-ai/"} "a decision procedure"] " to help with making sensible guesses."]]
+           " For human players such puzzles can quickly grow intractable, so this page implements " [:a {:href "https://bohlender.pro/blog/playing-hard-mastermind-games-with-a-sat-based-ai/"} "a decision procedure"] " to aid in making sensible guesses."]]
          [:div.block
           [tabs-component
            {[:a

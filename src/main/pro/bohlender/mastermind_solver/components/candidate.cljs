@@ -8,7 +8,6 @@
 
 (defn candidate-component [candidate-atom config-atom history-atom]
   (let [loading? (r/atom false)
-        ; TODO: Browser might not support workers
         worker (js/Worker. "/js/worker.js")]
     (.addEventListener worker "message" (fn [^js/MessageEvent event]
                                           ;(js/console.log event)
