@@ -6,26 +6,45 @@
             [pro.bohlender.mastermind-solver.components.tabs :refer [tabs-component]]
             [pro.bohlender.mastermind-solver.datastructures :refer [->Config ->Step ->Feedback]]))
 
+(def init-config
+  (->Config ["⚫" "\uD83D\uDD35" "\uD83D\uDFE2" "\uD83D\uDFE3" "\uD83D\uDD34" "\uD83D\uDFE1"] 4))
+
+(def init-history
+  [(->Step ["⚫" "\uD83D\uDFE3" "\uD83D\uDFE3" "\uD83D\uDD35"]
+           (->Feedback 0 1))
+   (->Step ["\uD83D\uDD34" "\uD83D\uDFE1" "⚫" "⚫"]
+           (->Feedback 1 2))
+   (->Step ["\uD83D\uDFE1" "\uD83D\uDFE2" "⚫" "\uD83D\uDD34"]
+           (->Feedback 2 1))])
+
 (defn default-guess [config]
   (let [{:keys [valid-symbols code-length]} config]
     (->> valid-symbols first (repeat code-length) vec)))
 
 (defn page []
-  (let [config-atom (r/atom (->Config ["⚫" "\uD83D\uDD35" "\uD83D\uDFE2" "\uD83D\uDFE3" "\uD83D\uDD34" "\uD83D\uDFE1"] 4))
-        history-atom (r/atom
-                       [(->Step ["⚫" "\uD83D\uDFE3" "\uD83D\uDFE3" "\uD83D\uDD35"]
-                                (->Feedback 0 1))
-                        (->Step ["\uD83D\uDD34" "\uD83D\uDFE1" "⚫" "⚫"]
-                                (->Feedback 1 2))
-                        (->Step ["\uD83D\uDFE1" "\uD83D\uDFE2" "⚫" "\uD83D\uDD34"]
-                                (->Feedback 2 1))])
+  (let [config-atom (r/atom init-config)
+        history-atom (r/atom init-history)
         candidate-atom (r/atom (default-guess @config-atom))
-        active-tab-idx-atom (r/atom 1)]
-    (letfn [(init-solver [new-config]
+        active-tab-idx-atom (r/atom 1)
+        computing?-atom (r/atom false)
+        worker (js/Worker. "/js/worker.js")]
+
+    (.addEventListener worker "message" (fn [^js/MessageEvent event]
+                                          (let [data (js->clj (.-data event))]
+                                            (println data)
+                                            (reset! candidate-atom data)
+                                            (reset! computing?-atom false))))
+    (.addEventListener worker "error" #(println "[Worker] Error: " %))
+
+    (letfn [(on-submit-config [new-config]
               (reset! config-atom new-config)
               (reset! history-atom [])
               (reset! candidate-atom (default-guess @config-atom))
-              (reset! active-tab-idx-atom 1))]
+              (reset! active-tab-idx-atom 1))
+            (on-submit-history []
+              (reset! computing?-atom true)
+              (.postMessage worker (clj->js {:config  @config-atom
+                                             :history @history-atom})))]
       (fn []
         [:div.section
          [:div.block
@@ -39,13 +58,15 @@
              [:span.icon [:i.fa.fa-cog]]
              [:span "Puzzle variant"]]
             [:div
-             [config-component init-solver]]
+             [config-component on-submit-config]]
             [:a
              [:span.icon [:i.fa.fa-lightbulb-o]]
              [:span "Solver"]]
-            [:div
+            [:form {:on-submit (fn [^js/SubmitEvent e]
+                                 (.preventDefault e)
+                                 (on-submit-history))}
              [:div.block
               [history-component config-atom history-atom]]
              [:div.block
-              [candidate-component candidate-atom config-atom history-atom]]]}
+              [candidate-component candidate-atom config-atom history-atom computing?-atom]]]}
            active-tab-idx-atom]]]))))

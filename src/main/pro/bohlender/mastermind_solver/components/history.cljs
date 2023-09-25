@@ -29,17 +29,21 @@
           [:th.has-text-centered [:abbr {:title "How many additional full matches can be achieved by reordering the symbols"} "Partial matches"]]
           [:th]]]
         [:tbody
-         (doall (for [[idx entry] (enumerate @history-atom)]
-            [:tr {:key idx}
-             [:td.is-narrow [guess-component @config-atom (:guess entry) (partial on-change-guess history-atom idx)]]
-             [:td [:input.input {:type      "number"
-                                 :min       0
-                                 :value     (get-in entry [:feedback :fm])
-                                 :on-change #(on-change-feedback history-atom idx :fm (-> % .-target .-value int))}]]
-             [:td [:input.input {:type      "number"
-                                 :min       0
-                                 :value     (get-in entry [:feedback :pm])
-                                 :on-change #(on-change-feedback history-atom idx :pm (-> % .-target .-value int))}]]
-             [:td.is-narrow [:button.button.is-danger
-                             {:on-click #(on-click-delete history-atom idx)}
-                             [:span.icon [:i.fa.fa-trash]]]]]))]]])]])
+         (doall
+           (for [[idx entry] (enumerate @history-atom)]
+             [:tr {:key idx}
+              [:td.is-narrow [guess-component @config-atom (:guess entry) (partial on-change-guess history-atom idx)]]
+              [:td [:input.input {:type      "number"
+                                  :required  true
+                                  :min       0
+                                  :value     (get-in entry [:feedback :fm])
+                                  :on-change #(on-change-feedback history-atom idx :fm (-> % .-target .-value int))}]]
+              [:td [:input.input {:type      "number"
+                                  :required  true
+                                  :min       0
+                                  :value     (get-in entry [:feedback :pm])
+                                  :on-change #(on-change-feedback history-atom idx :pm (-> % .-target .-value int))}]]
+              [:td.is-narrow [:button.button.is-danger
+                              {:type     "button"
+                               :on-click #(on-click-delete history-atom idx)}
+                              [:span.icon [:i.fa.fa-trash]]]]]))]]])]])

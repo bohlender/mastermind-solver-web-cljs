@@ -78,7 +78,7 @@
                      :class     (when error "is-danger")}]]
      [:p.help.is-danger error]]]])
 
-(defn config-component [init-solver]
+(defn config-component [on-submit-config]
   (let [custom?-atom (r/atom false)
         predefined-config-id-atom (r/atom (-> game-configs keys first))
         custom-valid-symbols-atom (r/atom {:value "" :error nil})
@@ -108,7 +108,7 @@
         [:button.button.is-warning
          {:on-click (fn []
                       (if-not @custom?-atom
-                        (init-solver (get game-configs @predefined-config-id-atom))
+                        (on-submit-config (get game-configs @predefined-config-id-atom))
                         (do
                           (swap! custom-valid-symbols-atom assoc
                                  :error (invalid-symbol-text? (:value @custom-valid-symbols-atom)))
@@ -116,6 +116,6 @@
                                  :error (invalid-code-length-text? (:value @custom-code-length-atom)))
                           (when-not (or (:error @custom-valid-symbols-atom)
                                         (:error @custom-code-length-atom))
-                            (init-solver (->Config (re-seq #"\S+" (:value @custom-valid-symbols-atom))
+                            (on-submit-config (->Config (re-seq #"\S+" (:value @custom-valid-symbols-atom))
                                                    (parse-long (:value @custom-code-length-atom))))))))}
          "Initialise new solver"]]])))
