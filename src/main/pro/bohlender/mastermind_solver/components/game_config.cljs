@@ -57,6 +57,7 @@
     [:div.field
      [:div.control
       [:input.input {:type      "text"
+                     :required  true
                      :disabled  disabled
                      :value     value
                      :on-change on-change
@@ -71,12 +72,18 @@
     [:div.field
      [:div.control
       [:input.input {:type      "number"
+                     :required  true
                      :min       1
                      :disabled  disabled
                      :value     value
                      :on-change on-change
                      :class     (when error "is-danger")}]]
      [:p.help.is-danger error]]]])
+
+(defn new-solver-button []
+  [:div.block>div.buttons.is-right
+   [:button.button.is-warning
+    "Initialise new solver"]])
 
 (defn config-component [on-submit-config]
   (let [custom?-atom (r/atom false)
@@ -91,11 +98,27 @@
         [config-chooser-component predefined-config-id-atom custom?-atom]]
        ; Predefined
        (let [{:keys [valid-symbols code-length]} (get game-configs @predefined-config-id-atom)]
-         [:div.block {:hidden @custom?-atom}
+         [:form.block
+          {:hidden    @custom?-atom
+           :on-submit (fn [^js/SubmitEvent e]
+                        (.preventDefault e)
+                        (on-submit-config (get game-configs @predefined-config-id-atom)))}
           [allowed-symbols-field (string/join " " valid-symbols) :disabled true]
-          [code-length-field code-length :disabled true]])
+          [code-length-field code-length :disabled true]
+          [new-solver-button]])
        ; Custom
-       [:div.block {:hidden (not @custom?-atom)}
+       [:form.block
+        {:hidden    (not @custom?-atom)
+         :on-submit (fn [^js/SubmitEvent e]
+                      (.preventDefault e)
+                      (swap! custom-valid-symbols-atom assoc
+                             :error (invalid-symbol-text? (:value @custom-valid-symbols-atom)))
+                      (swap! custom-code-length-atom assoc
+                             :error (invalid-code-length-text? (:value @custom-code-length-atom)))
+                      (when-not (or (:error @custom-valid-symbols-atom)
+                                    (:error @custom-code-length-atom))
+                        (on-submit-config (->Config (re-seq #"\S+" (:value @custom-valid-symbols-atom))
+                                                    (parse-long (:value @custom-code-length-atom))))))}
         [allowed-symbols-field (:value @custom-valid-symbols-atom)
          :on-change #(swap! custom-valid-symbols-atom assoc
                             :value (-> % .-target .-value))
@@ -103,19 +126,5 @@
         [code-length-field (:value @custom-code-length-atom)
          :on-change #(swap! custom-code-length-atom assoc
                             :value (-> % .-target .-value))
-         :error (:error @custom-code-length-atom)]]
-       [:div.block>div.buttons.is-right
-        [:button.button.is-warning
-         {:on-click (fn []
-                      (if-not @custom?-atom
-                        (on-submit-config (get game-configs @predefined-config-id-atom))
-                        (do
-                          (swap! custom-valid-symbols-atom assoc
-                                 :error (invalid-symbol-text? (:value @custom-valid-symbols-atom)))
-                          (swap! custom-code-length-atom assoc
-                                 :error (invalid-code-length-text? (:value @custom-code-length-atom)))
-                          (when-not (or (:error @custom-valid-symbols-atom)
-                                        (:error @custom-code-length-atom))
-                            (on-submit-config (->Config (re-seq #"\S+" (:value @custom-valid-symbols-atom))
-                                                   (parse-long (:value @custom-code-length-atom))))))))}
-         "Initialise new solver"]]])))
+         :error (:error @custom-code-length-atom)]
+        [new-solver-button]]])))
