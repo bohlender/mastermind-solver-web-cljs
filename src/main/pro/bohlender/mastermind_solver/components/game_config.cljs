@@ -39,17 +39,7 @@
            :on-change #(swap! custom? not)}]
          "Custom"]]]]]]])
 
-(defn invalid-symbol-text? [symbol-text]
-  (cond
-    (nil? symbol-text) "Symbols are required"
-    (empty? (re-seq #"\S+" symbol-text)) "At least one needed"))
-
-(defn invalid-code-length-text? [code-length-text]
-  (cond
-    (nil? code-length-text) "Code length is required"
-    (nil? (parse-long code-length-text)) "Not an integer"))
-
-(defn allowed-symbols-field [value & {:keys [on-change disabled error] :or {disabled false}}]
+(defn allowed-symbols-field [value & {:keys [on-change disabled] :or {disabled false}}]
   [:div.field.is-horizontal
    [:div.field-label.is-normal
     [:label.label "Allowed symbols"]]
@@ -60,11 +50,11 @@
                      :required  true
                      :disabled  disabled
                      :value     value
-                     :on-change on-change
-                     :class     (when error "is-danger")}]]
-     [:p.help.is-danger error]]]])
+                     :pattern   ".*\\S.*"
+                     :title     "needs one non-space character"
+                     :on-change (do on-change)}]]]]])
 
-(defn code-length-field [value & {:keys [on-change disabled error] :or {disabled false}}]
+(defn code-length-field [value & {:keys [on-change disabled] :or {disabled false}}]
   [:div.field.is-horizontal
    [:div.field-label.is-normal
     [:label.label "Code length"]]
@@ -76,9 +66,7 @@
                      :min       1
                      :disabled  disabled
                      :value     value
-                     :on-change on-change
-                     :class     (when error "is-danger")}]]
-     [:p.help.is-danger error]]]])
+                     :on-change on-change}]]]]])
 
 (defn new-solver-button []
   [:div.block>div.buttons.is-right
@@ -111,20 +99,12 @@
         {:hidden    (not @custom?-atom)
          :on-submit (fn [^js/SubmitEvent e]
                       (.preventDefault e)
-                      (swap! custom-valid-symbols-atom assoc
-                             :error (invalid-symbol-text? (:value @custom-valid-symbols-atom)))
-                      (swap! custom-code-length-atom assoc
-                             :error (invalid-code-length-text? (:value @custom-code-length-atom)))
-                      (when-not (or (:error @custom-valid-symbols-atom)
-                                    (:error @custom-code-length-atom))
-                        (on-submit-config (->Config (re-seq #"\S+" (:value @custom-valid-symbols-atom))
-                                                    (parse-long (:value @custom-code-length-atom))))))}
+                      (on-submit-config (->Config (re-seq #"\S+" (:value @custom-valid-symbols-atom))
+                                                  (parse-long (:value @custom-code-length-atom)))))}
         [allowed-symbols-field (:value @custom-valid-symbols-atom)
          :on-change #(swap! custom-valid-symbols-atom assoc
-                            :value (-> % .-target .-value))
-         :error (:error @custom-valid-symbols-atom)]
+                            :value (-> % .-target .-value))]
         [code-length-field (:value @custom-code-length-atom)
          :on-change #(swap! custom-code-length-atom assoc
-                            :value (-> % .-target .-value))
-         :error (:error @custom-code-length-atom)]
+                            :value (-> % .-target .-value))]
         [new-solver-button]]])))
