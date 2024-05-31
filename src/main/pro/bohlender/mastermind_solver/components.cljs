@@ -4,10 +4,10 @@
             [pro.bohlender.mastermind-solver.components.history :refer [history-component]]
             [pro.bohlender.mastermind-solver.components.candidate :refer [candidate-component]]
             [pro.bohlender.mastermind-solver.components.tabs :refer [tabs-component]]
-            [pro.bohlender.mastermind-solver.datastructures :refer [->Config ->Step ->Feedback]]))
+            [pro.bohlender.mastermind-solver.datastructures :refer [mk-config ->Step ->Feedback]]))
 
 (def init-config
-  (->Config ["⚫" "\uD83D\uDD35" "\uD83D\uDFE2" "\uD83D\uDFE3" "\uD83D\uDD34" "\uD83D\uDFE1"] 4))
+  (mk-config ["⚫" "\uD83D\uDD35" "\uD83D\uDFE2" "\uD83D\uDFE3" "\uD83D\uDD34" "\uD83D\uDFE1"] 4))
 
 (def init-history
   [(->Step ["⚫" "\uD83D\uDFE3" "\uD83D\uDFE3" "\uD83D\uDD35"]
@@ -28,7 +28,6 @@
         active-tab-idx-atom (r/atom 1)
         computing?-atom (r/atom false)
         worker (js/Worker. "/js/worker.js")]
-
     (.addEventListener worker "message" (fn [^js/MessageEvent event]
                                           (let [data (js->clj (.-data event))]
                                             (println data)

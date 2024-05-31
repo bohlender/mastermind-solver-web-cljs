@@ -1,18 +1,18 @@
 (ns pro.bohlender.mastermind-solver.components.game-config
   (:require [reagent.core :as r]
             [clojure.string :as string]
-            [pro.bohlender.mastermind-solver.datastructures :refer [->Config]]))
+            [pro.bohlender.mastermind-solver.datastructures :refer [mk-config]]))
 
 (def game-configs
-  {"Mastermind"          (->Config ["\uD83D\uDD35" "\uD83D\uDFE2" "\uD83D\uDFE1" "\uD83D\uDD34" "⚫" "⚪"]
+  {"Mastermind"          (mk-config ["\uD83D\uDD35" "\uD83D\uDFE2" "\uD83D\uDFE1" "\uD83D\uDD34" "⚫" "⚪"]
                                    4)
-   "Word Mastermind"     (->Config (vec (seq "abcdefghijklmnopqrstuvwxyz"))
+   "Word Mastermind"     (mk-config (vec (seq "abcdefghijklmnopqrstuvwxyz"))
                                    6)
-   "Number Mastermind"   (->Config ["1" "2" "3" "4" "5" "6"]
+   "Number Mastermind"   (mk-config ["1" "2" "3" "4" "5" "6"]
                                    4)
-   "Mastermind for Kids" (->Config ["\uD83D\uDC2F" "\uD83D\uDC12" "\uD83D\uDC18" "\uD83D\uDC3B" "\uD83E\uDD9B" "\uD83E\uDD81"]
+   "Mastermind for Kids" (mk-config ["\uD83D\uDC2F" "\uD83D\uDC12" "\uD83D\uDC18" "\uD83D\uDC3B" "\uD83E\uDD9B" "\uD83E\uDD81"]
                                    3)
-   "Mansions of Madness" (->Config ["\uD83D\uDFE2" "\uD83D\uDFE1" "\uD83D\uDD35" "\uD83D\uDD34" "⚪" "\uD83D\uDFE3"]
+   "Mansions of Madness" (mk-config ["\uD83D\uDFE2" "\uD83D\uDFE1" "\uD83D\uDD35" "\uD83D\uDD34" "⚪" "\uD83D\uDFE3"]
                                    6)})
 
 (defn config-chooser-component [game-config-id custom?]
@@ -99,7 +99,7 @@
         {:hidden    (not @custom?-atom)
          :on-submit (fn [^js/SubmitEvent e]
                       (.preventDefault e)
-                      (on-submit-config (->Config (re-seq #"\S+" (:value @custom-valid-symbols-atom))
+                      (on-submit-config (mk-config (re-seq #"\S+" (:value @custom-valid-symbols-atom))
                                                   (parse-long (:value @custom-code-length-atom)))))}
         [allowed-symbols-field (:value @custom-valid-symbols-atom)
          :on-change #(swap! custom-valid-symbols-atom assoc
