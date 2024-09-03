@@ -19,18 +19,19 @@
                                         :length   "int"})))
 
 (def library
-  (Wrapper. (clj->js {:mkGameConfig       [WasmGameConfig, ["number", "number"]]
+  (Wrapper. (clj->js {;:mkGameConfig       [WasmGameConfig, ["number", "number"]]
                       ;:mkFeedback         [WasmFeedback, ["number", "number"]]
                       :mkGuess            [WasmGuess, ["number", "number"]]
                       ;:dbgFeedback        [WasmFeedback, ["number", "number"]]
                       ;:dbgSolve           ["void", ["number", "number"]]
-                      :mkGameHistoryEntry [WasmGameHistoryEntry, [WasmGuess, WasmFeedback]]
+                      ;:mkGameHistoryEntry [WasmGameHistoryEntry, [WasmGuess, WasmFeedback]]
                       :mkGameHistory      [WasmGameHistory, ["number", "number"]]
                       :solve              ["void", [WasmGameConfig, WasmGameHistory, WasmGuess]] ; last arg is res
                       })))
 
 (defn Config->WasmGameConfig [{:keys [valid-symbols code-length] :as config}]
-  (.mkGameConfig library (count valid-symbols) code-length))
+  (WasmGameConfig. (clj->js {:numSymbols (count valid-symbols)
+                             :secretLength code-length})))
 
 (defn Feedback->WasmFeedback [feedback]
   (let [{:keys [fm pm]} feedback
@@ -62,9 +63,9 @@
 
 (defn GameHistory->WasmGameHistory [valid-symbols history]
   (let [elements (->> history
-                      (map (fn [e] (.mkGameHistoryEntry library
-                                                        (Guess->WasmGuess valid-symbols (:guess e))
-                                                        (Feedback->WasmFeedback (:feedback e))))))
+                      (map (fn [e] (WasmGameHistoryEntry. (clj->js
+                                                            {:guess (Guess->WasmGuess valid-symbols (:guess e))
+                                                             :feedback (Feedback->WasmFeedback (:feedback e))})))))
         addresses (map #(.ref %) elements)
         elements-addr (->> addresses
                            clj->js
@@ -79,6 +80,7 @@
     ;(println "expected second-element-addr: " (.ref (second elements)))
     ;(println "actual element-addrs: " (js/Int32Array. library.exports.memory.buffer elements-addr (count history)))
     (.mkGameHistory library elements-addr (count history))
+    ;(WasmGameHistory. (clj->js {:elements elements-addr :length (count history)}))
     ))
 
 
