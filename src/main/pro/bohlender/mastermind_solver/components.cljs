@@ -30,10 +30,14 @@
         worker (js/Worker. "/js/worker.js")]
     (.addEventListener worker "message" (fn [^js/MessageEvent event]
                                           (let [data (js->clj (.-data event))]
-                                            (println data)
-                                            (reset! candidate-atom data)
+                                            (println "Received data" data)
+                                            (if (some? data)
+                                              (reset! candidate-atom data)
+                                              (js/alert "There is no code that is consistent with the given history."))
                                             (reset! computing?-atom false))))
-    (.addEventListener worker "error" #(println "[Worker] Error: " %))
+    (.addEventListener worker "error" (fn [error] (do
+                                                    (js/console.log "[Worker] Error: " error)
+                                                    (reset! computing?-atom false))))
 
     (letfn [(on-submit-config [new-config]
               (reset! config-atom new-config)
