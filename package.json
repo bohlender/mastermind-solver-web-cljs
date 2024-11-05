@@ -5,9 +5,10 @@
   "devDependencies": {
     "bulma": "^0.9.4",
     "node-sass": "^9.0.0",
-    "shadow-cljs": "^2.24.1"
+    "shadow-cljs": "^2.28.19"
   },
   "dependencies": {
+    "mastermind-solver": "file:../mastermind-cpp/mastermind-solver-js",
     "react": "^18.3.1",
     "react-dom": "^18.2.0"
   },

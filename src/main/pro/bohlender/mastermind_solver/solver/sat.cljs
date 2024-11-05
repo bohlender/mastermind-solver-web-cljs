@@ -1,16 +1,13 @@
 (ns pro.bohlender.mastermind-solver.solver.sat
   (:require [pro.bohlender.mastermind-solver.solver.protocol :refer [Solver]]
-            [clojure.set :refer [map-invert]]))
+            [clojure.set :refer [map-invert]]
+            [mastermind-solver]))
 
 (def wasm-atom (atom nil))
 
 (defn load-wasm []
-  (-> (js/fetch "/js/mastermind_wasm.wasm")
-      (js/WebAssembly.instantiateStreaming)
-      (.then (fn [res]
-               (reset! wasm-atom (.-instance res))
-               ;(._initialize (.-exports (.-instance res))) // TODO: What for?
-               ))))
+  (-> (mastermind-solver)
+      (.then (fn [res] (reset! wasm-atom res)))))
 
 (defn- solve [{:keys [valid-symbols code-length] :as config} history]
   (let [int->symbol (->> (map-indexed vector valid-symbols)
@@ -18,20 +15,19 @@
         symbol->int (map-invert int->symbol)
         decode-code-fn (fn [wasm-code] (map int->symbol wasm-code))
         encode-code-fn (fn [guess] (map symbol->int guess))
-        exports (.-exports @wasm-atom)
-        buffer (.-memory.buffer exports)]
+        buffer (.-HEAP8.buffer ^js @wasm-atom)]
     (letfn [(solver-ctor [num-symbols secret-length]
-              (.Solver_ctor exports num-symbols secret-length))
+              (._Solver_ctor ^js @wasm-atom num-symbols secret-length))
             (solver-dtor [solver-ptr]
-              (.Solver_dtor exports solver-ptr))
+              (._Solver_dtor ^js @wasm-atom solver-ptr))
             (add-interaction [solver-ptr arr-ptr fm pm]
-              (.add_interaction exports solver-ptr arr-ptr fm pm))
+              (._add_interaction ^js @wasm-atom solver-ptr arr-ptr fm pm))
             (solve [solver-ptr code-ptr]
-              (.solve exports solver-ptr code-ptr))
+              (._solve ^js @wasm-atom solver-ptr code-ptr))
             (alloc-code [length]
-              (.malloc exports (* 4 length)))
+              (._malloc ^js @wasm-atom (* 4 length)))
             (free [ptr]
-              (.free exports ptr))
+              (._free ^js @wasm-atom ptr))
             (code->wasm-code [code]
               (let [ptr (alloc-code (count code))
                     arr (js/Int32Array. buffer ptr (count code))]
