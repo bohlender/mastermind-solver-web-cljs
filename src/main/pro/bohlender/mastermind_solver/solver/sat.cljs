@@ -1,12 +1,12 @@
 (ns pro.bohlender.mastermind-solver.solver.sat
   (:require [pro.bohlender.mastermind-solver.solver.protocol :refer [Solver]]
             [clojure.set :refer [map-invert]]
-            [mastermind-solver]))
+            [mastermind-solver-wasm]))
 
 (def wasm-atom (atom nil))
 
 (defn load-wasm []
-  (-> (mastermind-solver)
+  (-> (mastermind-solver-wasm)
       (.then (fn [res] (reset! wasm-atom res)))))
 
 (defn- solve [{:keys [valid-symbols code-length] :as config} history]
