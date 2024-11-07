@@ -1,6 +1,0 @@
-- In case of <noscript>, explain why it might be worth enabling JS on this page
-- In case Web Workers are not supported, show a sensible error or just compute on the main thread
-- Either use customize bulma.sass or use bulma.min.css -- not the uncustomized bulma.sass
-- Handle history incomplete
-- Handle no solution existing for the given history
-- Consistent validation. Either immediate or on "form submission"

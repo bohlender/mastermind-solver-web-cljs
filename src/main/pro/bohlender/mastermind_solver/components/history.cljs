@@ -25,7 +25,7 @@
         [:thead
          [:tr
           [:th.has-text-centered "Guess"]
-          [:th.has-text-centered [:abbr {:title "How many symbols coincide with the secret"} "Full matches"]]
+          [:th.has-text-centered [:abbr {:title "How many symbols coincide with the secret symbols"} "Full matches"]]
           [:th.has-text-centered [:abbr {:title "How many additional full matches can be achieved by reordering the symbols"} "Partial matches"]]
           [:th]]]
         [:tbody
