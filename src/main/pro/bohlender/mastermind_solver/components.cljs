@@ -49,27 +49,31 @@
               (.postMessage worker (clj->js {:config  @config-atom
                                              :history @history-atom})))]
       (fn []
-        [:div.section
-         [:div.block
-          [:h1.title "Mastermind Solver"]
-          [:p
-           "In " [:a {:href "https://en.wikipedia.org/wiki/Mastermind_(board_game)"} "Mastermind"] "-style puzzles you're expected to guess a secret code in as few tries as possible – guided only by the codemaker's feedback on your guesses."
-           " For human players such puzzles can quickly grow intractable, so this page implements " [:a {:href "https://bohlender.pro/blog/playing-hard-mastermind-games-with-a-sat-based-ai/"} "a decision procedure"] " to aid in making sensible guesses."]]
-         [:div.block
-          [tabs-component
-           {[:a
-             [:span.icon [:i.fa.fa-cog]]
-             [:span "Puzzle variant"]]
-            [:div
-             [config-component on-submit-config]]
-            [:a
-             [:span.icon [:i.fa.fa-lightbulb-o]]
-             [:span "Solver"]]
-            [:form {:on-submit (fn [^js/SubmitEvent e]
-                                 (.preventDefault e)
-                                 (on-submit-history))}
-             [:div.block
-              [history-component config-atom history-atom]]
-             [:div.block
-              [candidate-component candidate-atom config-atom history-atom computing?-atom]]]}
-           active-tab-idx-atom]]]))))
+        [:div.is-flex.is-flex-direction-column {:Style "min-height: 100vh"}
+         [:div.section.is-flex-grow-1
+          [:div.block
+           [:h1.title "Mastermind Solver"]
+           [:p
+            "In " [:a {:href "https://en.wikipedia.org/wiki/Mastermind_(board_game)"} "Mastermind"] "-style puzzles you're expected to guess a secret code in as few tries as possible – guided only by the codemaker's feedback on your guesses."
+            " For human players such puzzles can quickly grow intractable, so this page implements " [:a {:href "https://bohlender.pro/blog/playing-hard-mastermind-games-with-a-sat-based-ai/"} "a decision procedure"] " to aid in making sensible guesses."]]
+          [:div.block.is-align-self-stretch
+           [tabs-component
+            {[:a
+              [:span.icon [:i.fa.fa-cog]]
+              [:span "Puzzle variant"]]
+             [:div
+              [config-component on-submit-config]]
+             [:a
+              [:span.icon [:i.fa.fa-lightbulb-o]]
+              [:span "Solver"]]
+             [:form {:on-submit (fn [^js/SubmitEvent e]
+                                  (.preventDefault e)
+                                  (on-submit-history))}
+              [:div.block
+               [history-component config-atom history-atom]]
+              [:div.block
+               [candidate-component candidate-atom config-atom history-atom computing?-atom]]]}
+            active-tab-idx-atom]]]
+         [:footer.footer.py-1
+          [:div.content.has-text-centered.is-small
+           [:p "The " [:a {:href "https://github.com/bohlender/mastermind-solver-web-cljs"} "source code"] " is MIT licensed."]]]]))))

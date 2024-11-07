@@ -2,12 +2,13 @@
   "name": "mastermind-solver-website-cljs",
   "version": "0.0.1",
   "private": true,
+  "license": "mit",
   "devDependencies": {
-    "bulma": "^1.0.2",
-    "font-awesome": "^4.7.0",
     "shadow-cljs": "^2.28.19"
   },
   "dependencies": {
+    "bulma": "^1.0.2",
+    "font-awesome": "^4.7.0",
     "mastermind-solver-wasm": "^1.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.2.0"
