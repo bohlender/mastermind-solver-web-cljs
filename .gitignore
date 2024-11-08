@@ -1,8 +1,5 @@
 node_modules/
-public/js
-public/css
-public/font-awesome
-public/node_modules
+public/
 
 /target
 /checkouts

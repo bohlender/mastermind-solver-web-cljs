@@ -15,11 +15,13 @@
   },
   "scripts": {
     "pom": "npx shadow-cljs pom",
+    "cp-resources": "mkdir -p public && cp src/main/resources/* public",
     "css-build": "mkdir -p public/css && cp node_modules/bulma/css/bulma.min.css public/css/styles.css",
     "cp-fontawesome": "cp -r node_modules/font-awesome public",
     "cp-wasm": "mkdir -p public/node_modules/mastermind-solver-wasm && cp node_modules/mastermind-solver-wasm/mastermind.wasm public/node_modules/mastermind-solver-wasm/",
-    "pre-build": "npm install && npm run css-build && npm run cp-fontawesome && npm run cp-wasm",
-    "start": "npx shadow-cljs watch app",
-    "release": "npx shadow-cljs release app"
+    "pre-build": "npm install && npm run cp-resources && npm run css-build && npm run cp-fontawesome && npm run cp-wasm",
+
+    "start": "npm run pre-build && npx shadow-cljs watch app",
+    "release": "npm run pre-build && npx shadow-cljs release app"
   }
 }
