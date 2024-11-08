@@ -49,7 +49,7 @@
               (.postMessage worker (clj->js {:config  @config-atom
                                              :history @history-atom})))]
       (fn []
-        [:div.is-flex.is-flex-direction-column {:Style "min-height: 100vh"}
+        [:div.is-flex.is-flex-direction-column {:style {:min-height "100vh"}}
          [:div.section.is-flex-grow-1
           [:div.block
            [:h1.title "Mastermind Solver"]
@@ -69,7 +69,7 @@
              [:form {:on-submit (fn [^js/SubmitEvent e]
                                   (.preventDefault e)
                                   (on-submit-history))
-                     :Style "overflow: auto"}
+                     :style     {:overflow "auto"}}
               [:div.block
                [history-component config-atom history-atom]]
               [:div.block
