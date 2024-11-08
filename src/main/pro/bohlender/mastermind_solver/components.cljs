@@ -68,7 +68,8 @@
               [:span "Solver"]]
              [:form {:on-submit (fn [^js/SubmitEvent e]
                                   (.preventDefault e)
-                                  (on-submit-history))}
+                                  (on-submit-history))
+                     :Style "overflow: auto"}
               [:div.block
                [history-component config-atom history-atom]]
               [:div.block
