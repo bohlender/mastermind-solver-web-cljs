@@ -44,7 +44,8 @@
           (solver-dtor solver-ptr)
           (when solution-exists
             (let [secret (-> (js/Int32Array. buffer secret-ptr code-length)
-                             decode-code-fn)]
+                             decode-code-fn
+                             vec)]
               (free secret-ptr)
               secret)))))))
 
